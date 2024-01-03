@@ -5,7 +5,7 @@ import { supabase } from '../../utils/supabaseClient';
 import { useRouter } from 'next/navigation';
 
 export default function Page(){
-    const [email, setEmail] = useState('');
+const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();

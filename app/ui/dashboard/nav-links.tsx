@@ -20,7 +20,14 @@ const links = [
   { name: 'Vinyls', href: '/dashboard/vinyls', icon: MusicalNoteIcon },
 ];
 
-export default function NavLinks() {
+type NavLinksProps = {
+  collapsed: boolean;
+};
+type LogoProps = {
+  className?: string;
+};
+
+export default function NavLinks({collapsed}: NavLinksProps) {
   const pathname = usePathname();
   return (
     <>
