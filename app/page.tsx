@@ -1,7 +1,7 @@
 import Image from 'next/image'
-
+import Page from './welcome/page';
 export default function Home() {
   return (
-    <h1>Welcome to Stacks for wax!</h1>
+    <Page/>
   )
 }

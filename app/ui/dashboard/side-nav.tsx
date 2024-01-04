@@ -1,69 +1,88 @@
 'use client';
 import Link from 'next/link';
 import {useState} from 'react';
-import NavLinks from '@/app/ui/dashboard/nav-links';
-import Logo from '../acme-logo';
+import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { useRouter } from 'next/navigation';
-import { PowerIcon, Bars3Icon } from '@heroicons/react/24/outline';
-import { FiHome, FiHeart, FiRadio, FiMenu, FiSettings } from 'react-icons/fi';
+import { PowerIcon} from '@heroicons/react/24/outline';
+import Logo from '../logo';
+import { GiHamburgerMenu } from "react-icons/gi";
+import { PiSquaresFourLight, PiVinylRecordLight, PiHeartStraight, PiPlaylistFill, PiVinylRecordDuotone } from "react-icons/pi";
+import { Button, Card, CardBody } from "@nextui-org/react";
 export default function SideNav() {
-   const [collapsed, setCollapsed] = useState(false);
-  const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
 
-  const toggleSidebar = () => {
+  const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
-  const navigation = [
-    { name: 'Discover', icon: FiHome },
-    { name: 'Browse', icon: FiRadio },
-    { name: 'My Collection', icon: FiHeart },
-    // ... other navigation items
-  ];
-
+  const router = useRouter();
   return (
-    // <div className="flex h-full flex-col px-3 py-4 md:px-2">
-    //   <Link
-    //     className="mb-2 flex h-20 items-end justify-start rounded-md bg-green p-4 md:h-40"
-    //     href="/"
-    //   >
-    //     <div className="w-32 text-white md:w-40">
-    //       <Logo />
-    //     </div>
-    //   </Link>
-    //   <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
-    //     <NavLinks />
-    //     <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
-    //     <form>
-    //       <button className="flex h-[48px] w-full grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-gray-100 hover:text-green md:flex-none md:justify-start md:p-2 md:px-3">
-    //         <PowerIcon className="w-6" />
-    //         <div className="hidden md:block">Sign Out</div>
-    //       </button>
-    //     </form>
-    //   </div>
-    // </div>
-     <div className={`sidebar ${collapsed ? 'collapsed' : ''}`}>
-      <div className="sidebar-header">
-        <FiMenu className="hamburger-icon" onClick={toggleSidebar} />
-        <h1>MusicOn</h1>
-      </div>
-      <div className="nav-links">
-        {navigation.map((item, index) => (
-          <Link key={index} href={`/${item.name.toLowerCase()}`}>
-            <a className={`nav-item ${router.pathname === `/${item.name.toLowerCase()}` ? 'active' : ''}`}>
-              <item.icon className="icon" />
-              {!collapsed && <span className="link-text">{item.name}</span>}
-            </a>
-          </Link>
-        ))}
-      </div>
-      <div className="sidebar-footer">
+    <Sidebar collapsed={collapsed} className="bg-sidebar h-screen p-3">
+      <div className="sidebar-header flex items-center justify-between h-18 mb-4">
+        {/* Logo */}
         {!collapsed && (
-          <div className="settings">
-            <FiSettings className="icon" />
-            <span className="link-text">Settings</span>
+          <div className="flex items-center mb-4">
+            <Link href="/">
+              <Logo/>
+            </Link>
+            <p className="font-bold"></p>
           </div>
         )}
+        {/* Burger Icon for collapsing */}
+        <span onClick={toggleCollapsed} className=" flex items-center">
+          <GiHamburgerMenu className="text-hamburger text-lg" />
+        </span>
       </div>
-    </div>
+
+      {/* Sign Up Card */}
+      {!collapsed && (
+        <div className="signup-card mb-4">
+          <Card className="bg-white rounded-md">
+            <CardBody>
+              <p className="font-bold mb-4">Sign Up Now</p>
+              <p className="text-hamburger text-sm">
+                Follow your favorite artists and create unlimited playlists.
+              </p>
+              <Link href="/signup" className='border border-green text-green text-center hover:bg-green hover:text-white rounded-md mt-4 px-3 py-1'>
+                  Sign Up
+              </Link>
+            </CardBody>
+          </Card>
+        </div>
+      )}
+      <Menu className="bg-sidebar">
+        {/* Main items */}
+        <MenuItem icon={<PiSquaresFourLight className="text-green" />}>
+          <Link href="/dashboard" className=" text-sm">
+            {!collapsed && "Discover"}
+          </Link>
+        </MenuItem>
+        <MenuItem icon={<PiVinylRecordLight className="text-green" />}>
+          <Link href="/dashboard" className="text-sm">
+            {!collapsed && "Browse"}
+          </Link>
+        </MenuItem>
+        {/* My Collection */}
+        {!collapsed && (
+          <p className="text-xs text-hamburger mt-4">My Collection</p>
+        )}
+        <MenuItem icon={<PiHeartStraight className="text-green" />}>
+          <Link href="/dashboard/liked" className="text-sm">
+            {/* Updated usage */}
+           {!collapsed && "Liked Tracks"}
+          </Link>
+        </MenuItem>
+        <MenuItem icon={<PiVinylRecordLight className="text-green" />}>
+          <Link href="/dashboard/vinyls" className="text-sm" >
+            {/* Updated usage */}
+           {!collapsed && "Vinyls"}
+          </Link>
+        </MenuItem>
+        <MenuItem icon={<PiPlaylistFill className="text-green" />}>
+          <Link href="/dashboard/collections" className="text-sm" >
+            {!collapsed && "Collections"}
+          </Link>
+        </MenuItem>
+      </Menu>
+    </Sidebar>
   );
 }

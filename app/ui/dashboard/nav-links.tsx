@@ -5,29 +5,25 @@ import {
   HomeIcon,
   MusicalNoteIcon,
 } from '@heroicons/react/24/outline';
+import { PiSquaresFourLight, PiVinylRecordLight, PiHeartStraight, PiPlaylistFill, PiVinylRecordDuotone} from "react-icons/pi";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 // Map of links to display in the side navigation.
 
 const links = [
-  { name: 'Home', href: '/dashboard', icon: HomeIcon },
+  { name: 'Discover', href: '/dashboard', icon: PiSquaresFourLight },
+  { name: 'Browse', href: '/dashboard', icon: PiVinylRecordDuotone },
+  { name: 'Liked', href: '/dashboard/Liked', icon: PiHeartStraight },
   {
     name: 'Collections',
     href: '/dashboard/collections',
-    icon: ListBulletIcon,
+    icon: PiPlaylistFill,
   },
-  { name: 'Vinyls', href: '/dashboard/vinyls', icon: MusicalNoteIcon },
+  { name: 'Vinyls', href: '/dashboard/vinyls', icon: PiVinylRecordDuotone },
 ];
 
-type NavLinksProps = {
-  collapsed: boolean;
-};
-type LogoProps = {
-  className?: string;
-};
-
-export default function NavLinks({collapsed}: NavLinksProps) {
+export default function NavLinks() {
   const pathname = usePathname();
   return (
     <>
