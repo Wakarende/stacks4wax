@@ -8,8 +8,14 @@ import Logo from '../logo';
 import { GiHamburgerMenu } from "react-icons/gi";
 import { PiSquaresFourLight, PiVinylRecordLight, PiHeartStraight, PiPlaylistFill, PiVinylRecordDuotone } from "react-icons/pi";
 import { Button, Card, CardBody } from "@nextui-org/react";
-export default function SideNav() {
-  const [collapsed, setCollapsed] = useState(false);
+
+interface SideNavProps {
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+}
+
+export default function SideNav({collapsed, setCollapsed} : SideNavProps) {
+  // const [collapsed, setCollapsed] = useState(false);
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
