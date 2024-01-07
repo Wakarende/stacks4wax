@@ -59,7 +59,7 @@ export default function SideNav({collapsed, setCollapsed} : SideNavProps) {
         {/* Main items */}
         <MenuItem icon={<PiSquaresFourLight className="text-green" />}>
           <Link href="/dashboard" className=" text-sm">
-            {!collapsed && "Discover"}
+            {!collapsed && "Dashboard"}
           </Link>
         </MenuItem>
         <MenuItem icon={<PiVinylRecordLight className="text-green" />}>

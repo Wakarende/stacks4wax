@@ -8,7 +8,7 @@ export default function Page(){
       {/* The image container */}
       <div className="relative h-[800px] w-full">
         {/* background image */}
-        <Image src={welcome} alt="welcome" layout="fill" objectFit="cover" />
+        <Image src={welcome} alt="welcome" className="fill" objectFit="cover" />
       </div>
 
       {/* Button Container */}

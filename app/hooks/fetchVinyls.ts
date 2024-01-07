@@ -20,6 +20,7 @@ export const useVinyls = (): { vinyls: Vinyl[], loading: boolean, error: Postgre
     //Debugging
     console.log("Vinyl data: ",data);
       if (error) setError(error);
+      
       else setVinyls(data || []);
 
       setLoading(false);
