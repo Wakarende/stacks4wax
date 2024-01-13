@@ -86,57 +86,6 @@ After setting up the environment variables, start the application by running:
 ```bash
 npm run dev
 ```
-Absolutely! Below is a sample section you could add to your README to provide clear instructions for setting up your "Stacks of Wax" application locally using Next.js, Tailwind CSS, and Supabase. Make sure to replace any placeholder text with the actual details or requirements of your project.
-Local Setup Instructions
-
-To set up and run "Stacks of Wax" locally, follow these steps:
-Prerequisites
-
-Before you begin, ensure you have the following installed on your system:
-
-    Node.js (v12 or later)
-    npm (usually comes with Node.js)
-    A code editor of your choice (e.g., VSCode)
-
-Clone the Repository
-
-First, clone the repository to your local machine:
-
-bash
-
-git clone https://github.com/yourusername/stacksofwax.git
-cd stacksofwax
-
-Install Dependencies
-
-Next, install the necessary dependencies:
-
-bash
-
-npm install
-
-This will install Next.js, Tailwind CSS, and other required packages.
-Setting Up Supabase
-
-    Create a Supabase account and a new project at Supabase.
-
-    Once your project is created, go to the 'Settings' tab in your Supabase project dashboard and find your project's API keys.
-
-    Create a .env.local file in the root of your project and add your Supabase URL and Anon Key:
-
-    env
-
-    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-Running the Application
-
-After setting up the environment variables, start the application by running:
-
-bash
-
-npm run dev
-
 This will start the Next.js development server. Open the [Link](http://localhost:3000) in your browser to see the application.
 
 ### What I learned
