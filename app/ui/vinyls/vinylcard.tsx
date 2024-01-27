@@ -13,7 +13,7 @@ const AlbumCard: React.FC<AlbumCardProps> = ({ id,title, artist, image }) => {
   return (
     <div className="relative m-4 w-[224px] h-[224px] rounded-lg overflow-hidden hover:cursor-pointer">
       <img src={image} alt={title} className="w-full h-full" />
-      <Link href={`/dashboard/vinyls`} className="absolute inset-0 flex justify-center items-center opacity-0 hover:bg-gradient-to-t hover:from-black hover:to-transparent hover:opacity-100 transition-opacity duration-300">
+      <Link href={`/dashboard/vinyls?vinylId=${id}`} className="absolute inset-0 flex justify-center items-center opacity-0 hover:bg-gradient-to-t hover:from-black hover:to-transparent hover:opacity-100 transition-opacity duration-300">
         <FaPlay className="text-white text-3xl" />
       </Link>
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">

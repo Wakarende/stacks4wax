@@ -1,4 +1,3 @@
-
 "use client";
 import GenreList from "../ui/genre/genreList";
 import AlbumCard from "../ui/vinyls/vinylcard";

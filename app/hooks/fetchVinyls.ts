@@ -32,9 +32,9 @@ export const useVinyls = (): { vinyls: Vinyl[], loading: boolean, error: Postgre
           id: vinyl.id,
           title: vinyl.title,
           image: vinyl.image,
-          artist: vinyl.artist_id[0] ? {
-            id: vinyl.artist_id[0].id, // Assuming the id is part of the artist data
-            name: vinyl.artist_id[0].name
+          artist: vinyl.artist_id? {
+            id: vinyl.artist_id.id, // Assuming the id is part of the artist data
+            name: vinyl.artist_id.name
           } : { id: 0, name: 'Unknown Artist' }
         })) || [];
 
