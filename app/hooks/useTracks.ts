@@ -30,18 +30,21 @@ export const useTracks = (vinylId: number | undefined) => {
       console.log("Single Vinyl data: ",data);
       //Debugging
       console.error("Error fetching tracks:", error);
-      if (error) 
-      setError(error);
-      else 
-      //Debugging
-      console.log("Track data: " + data);
-      setTracks(data || []);
+      
+      if (error) {
+        console.error("Error fetching tracks:", error);
+        setError(error);
+      } else {
+        // Sort the tracks by track number
+        const sortedTracks = data ? [...data].sort((a, b) => a.track_number - b.track_number) : [];
+        console.log("Sorted track data: ", sortedTracks);
+        setTracks(sortedTracks);
+      }
       setLoading(false);
     };
-
-    
     fetchTracks();
   }, [vinylId]);
 
   return { tracks, loading, error };
 };
+
