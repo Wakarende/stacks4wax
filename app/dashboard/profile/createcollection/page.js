@@ -1,8 +1,13 @@
 "use client";
 import { useState } from "react";
 import Genre from "@/app/ui/genre/genre";
+import { useRouter } from "next/navigation";
 
 export default function CreateCollectionForm() {
+  const router = useRouter();
+  //Success Pop up
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
   // State for form fields
   const [formData, setFormData] = useState({
     name: "",
@@ -13,9 +18,16 @@ export default function CreateCollectionForm() {
   // State for selected vinyls
   const [selectedVinyls, setSelectedVinyls] = useState([]);
 
+  // Form validation
+  const [formErrors, setFormErrors] = useState({
+    name: "",
+    genre: "",
+    vinyls: "",
+  });
+
   // Dummy vinyl data
   const vinyls = [
-    { id: 1, name: "Vinyl 1", imageUrl: "/public/welcome.png" },
+    { id: 1, name: "Vinyl 1", imageUrl: "/public/logo.png" },
     { id: 2, name: "Vinyl 2", imageUrl: "/public/welcome.png" },
     { id: 3, name: "Vinyl 3", imageUrl: "/public/welcome.png" },
   ];
@@ -24,22 +36,36 @@ export default function CreateCollectionForm() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
+    // Reset the error message for the field being corrected.
+    setFormErrors((prevErrors) => ({ ...prevErrors, [name]: "" }));
   };
 
-  // Handling genre dropdown change
-  const handleGenreChange = (e) => {
-    setFormData((prevState) => ({ ...prevState, genre: e.target.value }));
-  };
-
-  // Handling vinyl selection
   const toggleVinylSelection = (vinylId) => {
     setSelectedVinyls((prev) => {
-      if (prev.includes(vinylId)) {
-        return prev.filter((id) => id !== vinylId);
-      } else {
-        return [...prev, vinylId];
-      }
+      const updatedSelection = prev.includes(vinylId)
+        ? prev.filter((id) => id !== vinylId)
+        : [...prev, vinylId];
+      setFormErrors({
+        ...formErrors,
+        vinyls:
+          updatedSelection.length > 0
+            ? ""
+            : "Please select at least one vinyl.",
+      });
+      return updatedSelection;
     });
+  };
+
+  const validateForm = () => {
+    let errors = {};
+    if (!formData.name.trim()) errors.name = "Name is required.";
+    if (!formData.genre) errors.genre = "Please select a genre.";
+    if (selectedVinyls.length === 0)
+      errors.vinyls = "Please select at least one vinyl.";
+
+    setFormErrors(errors);
+
+    return Object.keys(errors).length === 0;
   };
 
   // Dummy genres
@@ -64,17 +90,58 @@ export default function CreateCollectionForm() {
   // Function to handle genre selection
   const selectGenre = (genre) => {
     setFormData({ ...formData, genre });
+    setFormErrors((prevErrors) => ({ ...prevErrors, genre: "" }));
   };
 
+  //submit form
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      // Proceed with form submission logic, such as calling an API
+      console.log("Form is valid, proceed with submission...");
+      console.log({ ...formData, selectedVinyls });
+
+      // Show success message.
+      setShowSuccessPopup(true);
+      // Hide the popup after 3 seconds.
+      setTimeout(() => {
+        setShowSuccessPopup(false);
+        router.push("/dashboard/profile");
+      }, 3000);
+
+      // Reset form
+      setFormData({
+        name: "",
+        description: "",
+        genre: "",
+      });
+      setSelectedVinyls([]);
+      setFormErrors({
+        name: "",
+        genre: "",
+        vinyls: "",
+      });
+    } else {
+      console.log("Form is invalid, check errors.");
+
+      setFormData({
+        name: "",
+        description: "",
+        genre: "",
+      });
+      setSelectedVinyls([]);
+    }
+  };
   return (
     <div className="p-4">
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <label
             htmlFor="name"
             className="block text-xl text-gray-500 font-bold"
           >
-            Collection Name
+            Collection Name*
           </label>
           <input
             type="text"
@@ -84,6 +151,10 @@ export default function CreateCollectionForm() {
             value={formData.name}
             onChange={handleInputChange}
           />
+          {/* Form Errors */}
+          {formErrors.name && (
+            <p className="text-red-500 text-sm">{formErrors.name}</p>
+          )}
         </div>
 
         <div>
@@ -103,7 +174,7 @@ export default function CreateCollectionForm() {
           ></textarea>
         </div>
         <div>
-          <p className="mt-1 text-xl font-bold mb-4 text-gray-500">Genre</p>
+          <p className="mt-1 text-xl font-bold mb-4 text-gray-500">Genre*</p>
           <div className="flex flex-wrap justify-start">
             {genres.map((genre, index) => (
               <div key={index} className="m-2">
@@ -121,10 +192,13 @@ export default function CreateCollectionForm() {
               </div>
             ))}
           </div>
+          {formErrors.genre && (
+            <p className="text-red-500 text-sm">{formErrors.genre}</p>
+          )}
         </div>
         <fieldset>
           <legend className="mt-1 font-bold text-gray-500 text-xl ">
-            Choose Vinyls
+            Choose Vinyls*
           </legend>
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {vinyls.map((vinyl) => (
@@ -140,7 +214,7 @@ export default function CreateCollectionForm() {
                 <img
                   src={vinyl.imageUrl}
                   alt={vinyl.name}
-                  className="h-40 w-full object-cover"
+                  className="h-40 w-40 object-cover object-center"
                 />
                 <p className="mt-2 text-center text-sm font-medium text-gray-700">
                   {vinyl.name}
@@ -148,8 +222,10 @@ export default function CreateCollectionForm() {
               </div>
             ))}
           </div>
+          {formErrors.vinyls && (
+            <p className="text-red-500 text-sm">{formErrors.vinyls}</p>
+          )}
         </fieldset>
-
         {/* Submit Button */}
         <button
           type="submit"
@@ -158,6 +234,12 @@ export default function CreateCollectionForm() {
           Create Collection
         </button>
       </form>
+      {/* Conditional rendering of the success message */}
+      {showSuccessPopup && (
+        <div className="absolute top-0 right-0 m-4 bg-green-500 text-white p-2 rounded">
+          Collection created successfully!
+        </div>
+      )}
     </div>
   );
 }
