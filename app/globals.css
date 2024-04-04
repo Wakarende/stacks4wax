@@ -4,9 +4,11 @@
 
 :root {}
 
-@media (prefers-color-scheme: dark) {}
-
 
 body {
-    background-color: #fafafa;
+    background: linear-gradient(to bottom,
+            transparent,
+            rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
+
+@layer utilities {}
