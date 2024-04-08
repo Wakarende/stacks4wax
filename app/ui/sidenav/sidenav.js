@@ -11,6 +11,7 @@ import {
   PiHeartStraight,
   PiPlaylistFill,
 } from "react-icons/pi";
+import { GoPerson } from "react-icons/go";
 import { Button, Card, CardBody } from "@nextui-org/react";
 
 export default function SideNav({ collapsed, setCollapsed }) {
@@ -93,6 +94,11 @@ export default function SideNav({ collapsed, setCollapsed }) {
         <MenuItem icon={<PiPlaylistFill className="text-green" />}>
           <Link legacyBehavior href="/dashboard/collections">
             <a className="text-sm">{!collapsed && "Collections"}</a>
+          </Link>
+        </MenuItem>
+        <MenuItem icon={<GoPerson className="text-green" />}>
+          <Link legacyBehavior href="/dashboard/profile">
+            <a className="text-sm">{!collapsed && "Profile"}</a>
           </Link>
         </MenuItem>
       </Menu>
