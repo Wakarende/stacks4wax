@@ -1,9 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { BsSearch } from "react-icons/bs";
 import Link from "next/link";
 
-function Header({ isCollapsed }) {
+function Header({ isCollapsed, onSearch }) {
+  const handleSearchChange = (e) => {
+    onSearch(e.target.value); // Propagate the search term to the parent component.
+  };
   return (
     <header className="flex justify-between items-center py-4 px-8 bg-white border sticky top-0">
       <div className="flex-1 relative ">
@@ -12,6 +15,7 @@ function Header({ isCollapsed }) {
           type="search"
           placeholder="Search..."
           className="w-full pl-4 pr-10 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-gray-300"
+          onChange={handleSearchChange}
         />
         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
           <BsSearch className="text-gray-400" />

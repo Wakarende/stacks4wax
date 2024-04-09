@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 
-export const useVinyls = (genre) => {
+export const useVinyls = (genre, searchTerm) => {
   const [vinyls, setVinyls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,6 +18,9 @@ export const useVinyls = (genre) => {
         query = query.ilike("genre", `%${genre}%`);
       }
 
+      if (searchTerm) {
+        query = query.ilike("title", `%${searchTerm}%`); // Assumes searching by title. Adjust the field as necessary.
+      }
       const { data, error } = await query;
 
       if (error) {

@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { supabase } from "../../../utils/supabaseClient";
 import { useRouter } from "next/navigation";
-
+import { app } from "../../../utils/firebaseConfig";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,27 +11,27 @@ export default function Page() {
   const router = useRouter();
 
   const signUpNewUser = async (e) => {
-    e.preventDefault(); // Prevents the page from refreshing
+    e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        emailRedirectTo: "http://localhost:3000/dashboard",
-      },
-    });
+    const auth = getAuth(app);
 
-    if (error) {
-      console.error("Error signing up:", error);
-    } else {
-      console.log("User signed up:", data);
-      router.push("login");
-    }
-
-    setLoading(false);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log("User signed up:", user);
+        router.push("/dashboard/login"); // Adjust as necessary
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error("Error signing up:", errorCode, errorMessage);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
-
   return (
     <div className="flex justify-center items-start pt-12 h-screen">
       <div className="bg-white p-8 w-full max-w-md">

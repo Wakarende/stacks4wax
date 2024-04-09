@@ -1,33 +1,41 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "../../../utils/supabaseClient";
+import { AuthContext } from "../../page";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { app } from "../../../utils/firebaseConfig";
 
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  // const setUser = useContext(AuthContext);
   const router = useRouter();
 
   const signInWithEmail = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const auth = getAuth(app);
 
-    if (error) {
-      console.error("Error logging in:", error);
-    } else {
-      console.log("User signed in: ", data);
-      router.push("/dashboard"); // Redirect to the dashboard upon successful login
-    }
-    setLoading(false);
+    signInWithEmailAndPassword(auth, email, password)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        console.log("User signed in: ", user);
+        // setUser(user); // Assuming you're storing the user in context
+        router.push("/dashboard");
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error("Error logging in:", errorCode, errorMessage);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
-
   return (
     <div className="flex justify-center items-start pt-12 h-screen">
       <div className="bg-white p-8 w-full max-w-md">
