@@ -4,10 +4,14 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { app } from "../../../utils/firebaseConfig";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
+
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState("");
+
   const router = useRouter();
 
   const signUpNewUser = async (e) => {
@@ -15,17 +19,32 @@ export default function Page() {
     setLoading(true);
 
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // Signed in
+        // User successfully created, now add a document in Firestore
         const user = userCredential.user;
-        console.log("User signed up:", user);
-        router.push("/dashboard/login"); // Adjust as necessary
+        const userRef = doc(db, "users", user.uid); // Create a reference to a doc in 'users' collection with the user's UID
+        console.log("Username:", username);
+        setDoc(userRef, {
+          // Add any initial data you want for the user
+          email: user.email,
+          username: username,
+          createdAt: new Date(),
+        })
+          .then(() => {
+            console.log("User document created in Firestore");
+            router.push("/dashboard/login"); // Or wherever you wish to redirect
+          })
+          .catch((error) => {
+            console.error("Error adding user document:", error);
+          });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        // Handle errors (e.g., email already in use)
         console.error("Error signing up:", errorCode, errorMessage);
       })
       .finally(() => {
@@ -45,6 +64,19 @@ export default function Page() {
                 Login
               </Link>
             </p>
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-sm text-gray-400">
+              Username
+            </label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="mt-1 px-3 py-2 bg-white border border-gray-300 focus:outline-none focus:border-gray-300 block w-full rounded-md sm:text-sm focus:ring-1"
+            />
           </div>
           <div>
             <label htmlFor="email" className="block text-sm text-gray-400">

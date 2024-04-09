@@ -1,6 +1,6 @@
 // hooks/useTracks.js (create this file)
 import { useState, useEffect } from "react";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase } from "../../utils/supabaseClient";
 
 export const useTracks = (vinylId) => {
   const [tracks, setTracks] = useState([]);
