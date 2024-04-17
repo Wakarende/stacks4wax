@@ -2,7 +2,7 @@
 
 import { initializeApp } from "firebase/app";
 
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 // TODO: Add SDKs for Firebase products that you want to use
 
@@ -13,23 +13,30 @@ import { getAnalytics } from "firebase/analytics";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC53TiuQdYu_ZcnFAuloMRic9VaXrluHwc",
-
-  authDomain: "stack4wax.firebaseapp.com",
-
-  projectId: "stack4wax",
-
-  storageBucket: "stack4wax.appspot.com",
-
-  messagingSenderId: "124130761412",
-
-  appId: "1:124130761412:web:dcec6ac8b6246b83d30791",
-
-  measurementId: "G-DZL8VXZSTQ",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSENGER_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
-export const app = initializeApp(firebaseConfig);
+let analytics;
+// Only initialize Analytics if it's supported and if running client-side
+if (typeof window !== "undefined") {
+  isSupported()
+    .then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      }
+    })
+    .catch((error) => {
+      console.error("Analytics not supported", error);
+    });
+}
 
-const analytics = getAnalytics(app);
+export { app, analytics };

@@ -1,8 +1,11 @@
 import Genre from "./genre";
-
-const genres = ["rap", "R&B", "Pop"];
+import { useGenres } from "../../hooks/fetchGenre";
 
 function GenreList({ onGenreSelect }) {
+  const { genres, loading, error } = useGenres();
+
+  if (loading) return <div>Loading genres...</div>;
+  if (error) return <div>Error loading genres: {error.message}</div>;
   return (
     <div className="p-8">
       <p className="text-xl font-bold mb-4">Genres</p>

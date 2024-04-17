@@ -4,7 +4,7 @@ const Genre = ({ genreName, onClick }) => {
       <button
         type="button"
         className="py-2.5 px-4 focus:outline-none w-full"
-        onClick={onClick}
+        onClick={() => onClick(genreName)}
       >
         {genreName}
       </button>
