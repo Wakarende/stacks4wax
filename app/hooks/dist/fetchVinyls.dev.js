@@ -41,25 +41,33 @@ var useVinyls = function useVinyls(genre, searchTerm) {
     setLoading(true);
 
     var fetchVinyls = function fetchVinyls() {
-      var q, querySnapshot, vinylsData;
+      var q, conditions, querySnapshot, vinylsData;
       return regeneratorRuntime.async(function fetchVinyls$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.prev = 0;
+              q = (0, _firestore.query)((0, _firestore.collection)(db, "vinyls"));
+              conditions = [];
 
               if (genre) {
-                // Apply genre filter if a genre is provided
-                q = (0, _firestore.query)((0, _firestore.collection)(db, "vinyls"), (0, _firestore.where)("genre", "==", genre)); //debugging
-              } else {
-                // Otherwise, fetch all vinyls without filtering
-                q = (0, _firestore.query)((0, _firestore.collection)(db, "vinyls"));
+                conditions.push((0, _firestore.where)("genre", "==", genre));
               }
 
-              _context.next = 4;
+              if (searchTerm && searchTerm.trim() !== "") {
+                // Assuming the search is case insensitive and partial matches are allowed
+                conditions.push((0, _firestore.where)("title", ">=", searchTerm));
+                conditions.push((0, _firestore.where)("title", "<=", searchTerm + "\uF8FF"));
+              }
+
+              if (conditions.length > 0) {
+                q = _firestore.query.apply(void 0, [q].concat(conditions));
+              }
+
+              _context.next = 8;
               return regeneratorRuntime.awrap((0, _firestore.getDocs)(q));
 
-            case 4:
+            case 8:
               querySnapshot = _context.sent;
               vinylsData = querySnapshot.docs.map(function (doc) {
                 var vinylData = doc.data();
@@ -72,23 +80,23 @@ var useVinyls = function useVinyls(genre, searchTerm) {
                 };
               });
               setVinyls(vinylsData);
-              _context.next = 12;
+              _context.next = 16;
               break;
 
-            case 9:
-              _context.prev = 9;
+            case 13:
+              _context.prev = 13;
               _context.t0 = _context["catch"](0);
               setError(_context.t0);
 
-            case 12:
+            case 16:
               setLoading(false);
 
-            case 13:
+            case 17:
             case "end":
               return _context.stop();
           }
         }
-      }, null, null, [[0, 9]]);
+      }, null, null, [[0, 13]]);
     };
 
     fetchVinyls();

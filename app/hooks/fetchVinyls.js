@@ -7,8 +7,6 @@ import {
   getDocs,
   join,
 } from "firebase/firestore";
-import { getDoc } from "firebase/firestore";
-
 import { app } from "../../utils/firebaseConfig";
 
 export const useVinyls = (genre, searchTerm) => {
@@ -22,14 +20,20 @@ export const useVinyls = (genre, searchTerm) => {
     setLoading(true);
     const fetchVinyls = async () => {
       try {
-        let q;
+        let q = query(collection(db, "vinyls"));
+
+        const conditions = [];
         if (genre) {
-          // Apply genre filter if a genre is provided
-          q = query(collection(db, "vinyls"), where("genre", "==", genre));
-          //debugging
-        } else {
-          // Otherwise, fetch all vinyls without filtering
-          q = query(collection(db, "vinyls"));
+          conditions.push(where("genre", "==", genre));
+        }
+        if (searchTerm && searchTerm.trim() !== "") {
+          // Assuming the search is case insensitive and partial matches are allowed
+          conditions.push(where("title", ">=", searchTerm));
+          conditions.push(where("title", "<=", searchTerm + "\uf8ff"));
+        }
+
+        if (conditions.length > 0) {
+          q = query(q, ...conditions);
         }
         const querySnapshot = await getDocs(q);
         const vinylsData = querySnapshot.docs.map((doc) => {
