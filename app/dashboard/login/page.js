@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../../../utils/firebaseConfig";
-import { useAuth } from "../../context/authContext";
 
 export default function Page() {
   const [email, setEmail] = useState("");

@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AuthProvider } from "./hooks/useAuth";
 import "./globals.css";
-import { supabase } from "../utils/supabaseClient";
 
 const inter = Inter({ subsets: ["latin"] });
 

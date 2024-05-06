@@ -3,7 +3,6 @@ import { useState, useContext } from "react";
 import GenreList from "../ui/genre/genreList";
 import AlbumCard from "../ui/vinyls/vinylcard";
 import { useVinyls } from "../hooks/fetchVinyls";
-import { useAuth } from "../context/authContext";
 import Image from "next/legacy/image";
 import welcome from "../../public/welcome.png";
 import Link from "next/link";
