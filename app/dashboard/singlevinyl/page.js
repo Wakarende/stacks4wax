@@ -1,139 +1,123 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { FaPlay } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 import {
-  BsHeart,
-  BsHeartFill,
-  BsDownload,
-  BsThreeDotsVertical,
-} from "react-icons/bs";
+  getFirestore,
+  doc,
+  getDoc,
+  collection,
+  query,
+  getDocs,
+} from "firebase/firestore";
+import { app } from "../../../utils/firebaseConfig";
 import Image from "next/image";
-import { useTracks } from "@/app/hooks/useTracks";
-import { useSearchParams } from "next/navigation";
-import { useVinyls } from "@/app/hooks/fetchVinyls";
-import { supabase } from "@/utils/supabaseClient";
-import { PostgrestError } from "@supabase/supabase-js";
-import { Vinyl } from "@/app/hooks/fetchVinyls";
+import { FaPlay } from "react-icons/fa";
+import { BsHeart } from "react-icons/bs";
 
-export default function Page() {
-  const searchParams = useSearchParams();
-  const rawVinylId = searchParams.get("vinylId"); // Get 'vinylId' from the URL's query string
-  console.log("Raw vinylID fom URL: ", rawVinylId);
+const SingleVinylPage = () => {
+  const router = useRouter();
   const [vinyl, setVinyl] = useState(null);
-  const [loadingVinyl, setLoadingVinyl] = useState(true);
-  const [errorVinyl, setErrorVinyl] = useState(null);
-
-  const parsedVinylId = rawVinylId ? parseInt(rawVinylId, 10) : undefined;
-  console.log("Parsed vinylId: ", parsedVinylId);
-  // Use your existing hooks to fetch tracks
-  const {
-    tracks,
-    loading: loadingTracks,
-    error: errorTracks,
-  } = useTracks(parsedVinylId);
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (parsedVinylId && !isNaN(parsedVinylId)) {
-      setLoadingVinyl(true);
-      const fetchVinyl = async () => {
-        const { data, error } = await supabase
-          .from("vinyls")
-          .select(`id, title, image, artist_id!inner(id, name)`)
-          .eq("id", parsedVinylId)
-          .single(); // Fetch single record
-        console.log("Fetched vinyl data: ", data);
-        if (error) {
-          console.error("Error fetching vinyl: ", error);
-          setErrorVinyl(error);
-        } else {
-          // Transform the data to match the Vinyl type
-          const transformedData = data
-            ? {
-                ...data,
-                artist: data.artist_id
-                  ? {
-                      id: data.artist_id.id,
-                      name: data.artist_id.name,
-                    }
-                  : { id: 0, name: "Unknown Artist" },
-              }
-            : null;
-          setVinyl(transformedData);
-        }
-        setLoadingVinyl(false);
-      };
+    const db = getFirestore(app);
 
-      fetchVinyl();
+    // This checks if the router parameters are ready to be read
+    if (!router.isReady) {
+      console.log("Router is not ready.");
+      return;
     }
-  }, [parsedVinylId]);
-  // Handle loading and error states
-  // if (loadingVinyl || tracksLoading) return <div>Loading...</div>;
-  if (errorVinyl) return <div>Error: {errorVinyl.message}</div>;
-  // if (tracksError) return <div>Error: {tracksError.message}</div>;
-  if (!vinyl) return <div>Vinyl not found</div>;
+
+    // Getting the vinyl ID from the URL query parameters
+    const fetchedVinylId = router.query.vinylId;
+    console.log("Router is ready, vinylId:", fetchedVinylId);
+
+    // If no vinyl ID is provided in the URL, we stop here and set an error
+    if (!fetchedVinylId) {
+      console.log("No vinylId provided, exiting fetch.");
+      setLoading(false);
+      setError("No vinyl ID provided.");
+      return;
+    }
+
+    // Function to fetch vinyl details and tracks from Firestore
+    const fetchVinylDetails = async (vinylId) => {
+      setLoading(true);
+
+      try {
+        console.log("Fetching vinyl details for ID:", vinylId);
+        const vinylDocRef = doc(db, "vinyls", vinylId);
+        const vinylDoc = await getDoc(vinylDocRef);
+
+        if (!vinylDoc.exists()) {
+          throw new Error("Vinyl not found.");
+        }
+
+        setVinyl({ id: vinylDoc.id, ...vinylDoc.data() });
+
+        const tracksQuery = query(collection(vinylDocRef, "tracks"));
+        const tracksSnapshot = await getDocs(tracksQuery);
+        const fetchedTracks = tracksSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setTracks(fetchedTracks);
+      } catch (err) {
+        console.error("Error fetching vinyl details:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Calling the fetch function with the fetched vinyl ID
+    fetchVinylDetails(fetchedVinylId);
+  }, [router.isReady, router.query]);
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!vinyl) return <div>Vinyl not found.</div>;
+
   return (
     <div className="container mx-auto p-6">
-      {vinyl && (
-        <div>
-          {/* Vinyl details */}
-          <div className="flex flex-col lg:flex-row">
-            <div className="w-full lg:w-1/3 mb-4 lg:mb-0">
-              <Image
-                src={vinyl.image}
-                alt={vinyl.title}
-                className="rounded-xl shadow-xl"
-                width={400}
-                height={400}
-              />
-            </div>
-            <div className="w-full lg:w-2/3 lg:pl-10">
-              <h2 className="text-4xl font-bold text-gray-800">
-                {vinyl.title}
-              </h2>
-              <p className="text-lg text-gray-600 my-2">{vinyl.artist.name}</p>
-              <p className="text-gray-500 text-sm mb-4">
-                Number of Tracks: {tracks.length}
-              </p>
-            </div>
-          </div>
-          {/* Tracks listing */}
-          <div className="mt-6">
-            <div className="flex items-center mb-6">
-              <button className="flex items-center justify-center bg-green text-white rounded-md p-3 pr-7 pl-7 mr-4">
-                <FaPlay className="mr-2" />
-                Play
-              </button>
-              <span className="text-gray-600 mr-4">
-                <BsHeart />
-              </span>
-            </div>
-            <div className="space-y-2 mt-2 ">
-              {tracks.map((track) => (
-                <div
-                  key={track.id}
-                  className="flex items-center justify-between p-2 hover:bg-gray-100 hover:rounded-md pl-5 pr-5 pt-4 pb-4"
-                >
-                  <div className="flex items-center">
-                    <span className="text-gray-800 text-md mr-2">
-                      {track.track_number}
-                    </span>
-                    <span className="text-gray-800 text-md mr-2 ">
-                      {track.title}
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="text-gray-600 mr-4">
-                      <BsHeart className="inline" />
-                    </span>
-                    <span className="text-gray-600">{track.duration}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+      <div className="flex flex-col lg:flex-row">
+        <div className="w-full lg:w-1/3 mb-4 lg:mb-0">
+          <Image
+            src={vinyl.image}
+            alt={vinyl.title}
+            width={400}
+            height={400}
+            className="rounded-xl shadow-xl"
+          />
+        </div>
+        <div className="w-full lg:w-2/3 lg:pl-10">
+          <h2 className="text-4xl font-bold text-gray-800">{vinyl.title}</h2>
+          <p className="text-lg text-gray-600 my-2">{vinyl.artist}</p>
+          <div className="mt-4">
+            <button className="flex items-center justify-center bg-green-500 text-white rounded-md p-3">
+              <FaPlay className="mr-2" /> Play All
+            </button>
           </div>
         </div>
-      )}
-      {!vinyl && !loadingVinyl && <div>Vinyl not found.</div>}
+      </div>
+      <div className="mt-6">
+        {tracks.map((track) => (
+          <div
+            key={track.id}
+            className="flex items-center justify-between p-2 hover:bg-gray-100 rounded-md"
+          >
+            <span className="text-gray-800">{track.title}</span>
+            <span>
+              <BsHeart />
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default SingleVinylPage;

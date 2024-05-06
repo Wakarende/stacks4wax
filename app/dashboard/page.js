@@ -3,10 +3,13 @@ import { useState, useContext } from "react";
 import GenreList from "../ui/genre/genreList";
 import AlbumCard from "../ui/vinyls/vinylcard";
 import { useVinyls } from "../hooks/fetchVinyls";
-import { AuthContext } from "../page";
+import { useAuth } from "../context/authContext";
+import Image from "next/legacy/image";
+import welcome from "../../public/welcome.png";
+import Link from "next/link";
+import { ForwardIcon } from "@heroicons/react/24/outline";
 
 export default function Page() {
-  const user = useContext(AuthContext);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const { vinyls, loading, error } = useVinyls(selectedGenre);
   if (loading) return <div>Loading...</div>;
@@ -14,7 +17,6 @@ export default function Page() {
   return (
     <div>
       <p className="text-xl font-bold mb-4">Vinyls</p>
-      {user && <div>Welcome, {user.email}! Explore our vinyl collection.</div>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
         {vinyls.map((vinyl) => (
           <AlbumCard
@@ -27,7 +29,6 @@ export default function Page() {
         ))}
       </div>
       <GenreList onGenreSelect={setSelectedGenre} />
-      {!user && <div>Sign in for a personalized experience.</div>}
     </div>
   );
 }

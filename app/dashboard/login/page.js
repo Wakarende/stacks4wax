@@ -1,24 +1,23 @@
 "use client";
 import Link from "next/link";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthContext } from "../../page";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "../../../utils/firebaseConfig";
+import { useAuth } from "../../context/authContext";
 
 export default function Page() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
   // const setUser = useContext(AuthContext);
   const router = useRouter();
 
   const signInWithEmail = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     const auth = getAuth(app);
-
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in

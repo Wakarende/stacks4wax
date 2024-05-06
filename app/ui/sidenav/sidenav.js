@@ -97,7 +97,7 @@ export default function SideNav({ collapsed, setCollapsed }) {
           </Link>
         </MenuItem>
         <MenuItem icon={<GoPerson className="text-green" />}>
-          <Link legacyBehavior href="/profile">
+          <Link legacyBehavior href="/dashboard/profile">
             <a className="text-sm">{!collapsed && "Profile"}</a>
           </Link>
         </MenuItem>

@@ -10,7 +10,6 @@
 //         {/* background image */}
 //         <Image src={welcome} alt="welcome" className="fill" objectFit="cover" />
 //       </div>
-
 //       {/* Button Container */}
 //       <div className="absolute bottom-0 w-full flex justify-center pb-6">
 //         {/* Explore Collections Button */}
@@ -21,3 +20,4 @@
 //     </div>
 //   );
 // }
+"use strict";
