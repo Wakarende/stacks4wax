@@ -1,15 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import { useAuth } from "../../hooks/useAuth";
 
 const ProfileHeader = () => {
+  const { user } = useAuth();
   // Dummy data for the profile
   const profileData = {
-    avatarUrl: "/Damn.jpg", // Replace with your actual image path
-    name: "Jack Orion",
-    description: "Follow your favorite artists and create unlimited playlists.",
+    avatarUrl: "/Damn.jpg",
+    name: user.username,
   };
-
   return (
     <div className="flex flex-row items-center mb-4">
       <Image

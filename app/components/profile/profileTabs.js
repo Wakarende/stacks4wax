@@ -5,8 +5,6 @@ const ProfileTabs = ({ onSelectTab, activeTab }) => {
     { name: "Collections", count: 76 },
     { name: "Vinyls", count: 4 },
     { name: "Likes", count: 5 },
-    { name: "Followers", count: 5 },
-    { name: "Following", count: 5 },
   ];
 
   return (
