@@ -134,13 +134,10 @@ export default function CreateCollectionForm() {
     }
   };
   return (
-    <div className="p-4">
+    <div className="p-4 max-w-xl mx-auto">
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
-          <label
-            htmlFor="name"
-            className="block text-xl text-gray-500 font-bold"
-          >
+          <label htmlFor="name" className="block text-xl font-bold">
             Collection Name*
           </label>
           <input
@@ -158,10 +155,7 @@ export default function CreateCollectionForm() {
         </div>
 
         <div>
-          <label
-            htmlFor="description"
-            className="mt-1 block text-xl text-gray-500 font-bold"
-          >
+          <label htmlFor="description" className="mt-1 block text-xl font-bold">
             Description
           </label>
           <textarea
@@ -174,7 +168,7 @@ export default function CreateCollectionForm() {
           ></textarea>
         </div>
         <div>
-          <p className="mt-1 text-xl font-bold mb-4 text-gray-500">Genre*</p>
+          <p className="mt-1 text-xl font-bold mb-4">Genre*</p>
           <div className="flex flex-wrap justify-start">
             {genres.map((genre, index) => (
               <div key={index} className="m-2">
@@ -197,9 +191,7 @@ export default function CreateCollectionForm() {
           )}
         </div>
         <fieldset>
-          <legend className="mt-1 font-bold text-gray-500 text-xl ">
-            Choose Vinyls*
-          </legend>
+          <legend className="mt-1 font-bold text-xl ">Choose Vinyls*</legend>
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {vinyls.map((vinyl) => (
               <div
@@ -214,7 +206,7 @@ export default function CreateCollectionForm() {
                 <img
                   src={vinyl.imageUrl}
                   alt={vinyl.name}
-                  className="h-40 w-40 object-cover object-center"
+                  className="h-auto w-40 object-cover object-center"
                 />
                 <p className="mt-2 text-center text-sm font-medium text-gray-700">
                   {vinyl.name}
