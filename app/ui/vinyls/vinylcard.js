@@ -3,7 +3,7 @@ import { FaPlay } from "react-icons/fa";
 import Link from "next/link";
 import Image from "next/image";
 
-const AlbumCard = ({ id, title, artist, image }) => {
+const AlbumCard = ({ id, title, artist, image, link }) => {
   return (
     <div className="relative m-4 w-[190px] h-[190px] rounded-lg overflow-hidden hover:cursor-pointer">
       <Image
@@ -13,7 +13,7 @@ const AlbumCard = ({ id, title, artist, image }) => {
         width={200}
         height={200}
       />
-      <Link legacyBehavior href={`/dashboard/singlevinyl?vinylId=${id}`}>
+      <Link legacyBehavior href={link}>
         <a className="absolute inset-0 flex justify-center items-center opacity-0 hover:bg-gradient-to-t hover:from-black hover:to-transparent hover:opacity-100 transition-opacity duration-300">
           <FaPlay className="text-white text-3xl" />
         </a>

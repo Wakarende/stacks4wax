@@ -10,79 +10,83 @@ import {
 import { useAuth } from "./useAuth"; // Assuming useAuth is your auth hook that provides user info
 import { app } from "../../utils/firebaseConfig";
 
+//fetch collections for logged in user
 export const useUserCollections = () => {
-  const [collections, setCollections] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const { user } = useAuth();
+  const [collections, setCollections] = useState([]);
+  const [error, setError] = useState(null);
   const db = getFirestore(app);
 
   useEffect(() => {
-    if (user) {
-      console.log("Fetching collections for user:", user.uid);
-      setLoading(true);
-      const collectionsRef = collection(db, "collections");
-      const userRef = doc(db, "users", user.uid);
-      const q = query(collectionsRef, where("user_id", "==", userRef));
+    if (!user) return;
 
-      getDocs(q)
-        .then((querySnapshot) => {
-          console.log("Documents fetched:", querySnapshot.docs.length);
-          const userCollections = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setCollections(userCollections);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching user collections:", err);
-          setError(err);
-          setLoading(false);
-        });
-    } else {
-      console.log("No user logged in or user data not available yet.");
-    }
+    const fetchCollections = async () => {
+      try {
+        const collectionsRef = collection(db, `users/${user.uid}/collections`);
+        const collectionsSnapshot = await getDocs(collectionsRef);
+        const collectionsData = collectionsSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        console.log("Fetched collections:", collectionsData);
+        setCollections(collectionsData);
+      } catch (err) {
+        console.error("Error fetching collections:", err);
+        setError(err);
+      }
+    };
+
+    fetchCollections();
   }, [user, db]);
 
-  return { collections, loading, error };
+  return { collections, error };
 };
 
-//Fetch vinyls for user
-export const useUserVinyls = () => {
+//Fetch vinyls for logged in user
+const useUserVinyls = () => {
+  const { user } = useAuth();
   const [vinyls, setVinyls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
   const db = getFirestore(app);
 
   useEffect(() => {
-    if (user) {
-      console.log("Fetching vinyls for user:", user.uid);
-      setLoading(true);
-      const vinylsRef = collection(db, "vinyls");
-      const userRef = doc(db, "users", user.uid);
-      const q = query(vinylsRef, where("user_id", "==", userRef));
+    if (!user) return;
 
-      getDocs(q)
-        .then((querySnapshot) => {
-          console.log("Vinyls fetched:", querySnapshot.docs.length);
-          const userVinyls = querySnapshot.docs.map((doc) => ({
+    const fetchUserVinyls = async () => {
+      setLoading(true);
+      try {
+        const collectionsRef = collection(db, `users/${user.uid}/collections`);
+        const collectionsSnapshot = await getDocs(collectionsRef);
+        const collectionIds = collectionsSnapshot.docs.map((doc) => doc.id);
+
+        const vinylPromises = collectionIds.map(async (collectionId) => {
+          const vinylsRef = collection(
+            db,
+            `users/${user.uid}/collections/${collectionId}/vinyls`
+          );
+          const vinylsSnapshot = await getDocs(vinylsRef);
+          return vinylsSnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
-          setVinyls(userVinyls);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching user vinyls:", err);
-          setError(err);
-          setLoading(false);
         });
-    } else {
-      console.log("No user logged in or user data not available yet.");
-    }
+
+        const vinylsArray = await Promise.all(vinylPromises);
+        const userVinyls = vinylsArray.flat();
+        setVinyls(userVinyls);
+      } catch (err) {
+        console.error("Error fetching user vinyls:", err);
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserVinyls();
   }, [user, db]);
 
   return { vinyls, loading, error };
 };
+
+export { useUserVinyls };

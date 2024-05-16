@@ -24,6 +24,7 @@ export default function Page() {
             title={vinyl.title}
             artist={vinyl.artist.name}
             image={vinyl.image}
+            link={`/dashboard/singlevinyl/${vinyl.id}`}
           />
         ))}
       </div>
