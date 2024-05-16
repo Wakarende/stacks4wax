@@ -1,5 +1,11 @@
 import { useState, useEffect, useContext } from "react";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { useAuth } from "./useAuth"; // Assuming useAuth is your auth hook that provides user info
 import { app } from "../../utils/firebaseConfig";
 
@@ -32,7 +38,27 @@ export const useUserCollections = () => {
     fetchCollections();
   }, [user, db]);
 
-  return { collections, error };
+  const fetchCollectionDetails = async (collectionId) => {
+    if (!user) return null;
+    try {
+      const collectionRef = doc(
+        db,
+        `users/${user.uid}/collections/${collectionId}`
+      );
+      const collectionDoc = await getDoc(collectionRef);
+      if (collectionDoc.exists()) {
+        return { id: collectionDoc.id, ...collectionDoc.data() };
+      } else {
+        return null;
+      }
+    } catch (err) {
+      console.error("Error fetching collection details:", err);
+      setError(err);
+      return null;
+    }
+  };
+
+  return { collections, fetchCollectionDetails, error };
 };
 
 //Fetch vinyls for logged in user

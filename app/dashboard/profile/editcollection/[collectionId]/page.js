@@ -1,16 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { getFirestore, doc, updateDoc, getDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useAuth } from "../../../hooks/useAuth";
-import { useRouter } from "next/navigation";
-import { app } from "../../../../utils/firebaseConfig";
+import { useAuth } from "../../../../hooks/useAuth";
+import { useRouter, useParams } from "next/navigation";
+import { app } from "../../../../../utils/firebaseConfig";
 
-export default function CreateCollectionForm() {
+export default function EditCollectionForm() {
   const { user } = useAuth();
   const router = useRouter();
+  const { collectionId } = useParams(); // Use useParams to get the collectionId from the URL
 
-  // State for form fields
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -26,10 +26,27 @@ export default function CreateCollectionForm() {
     cover_image: "",
   });
 
-  //debugging
   useEffect(() => {
-    console.log("User object:", user);
-  }, [user]);
+    if (!user || !collectionId) return;
+
+    const fetchCollectionDetails = async () => {
+      try {
+        const db = getFirestore(app);
+        const collectionRef = doc(
+          db,
+          `users/${user.uid}/collections/${collectionId}`
+        );
+        const collectionDoc = await getDoc(collectionRef);
+        if (collectionDoc.exists()) {
+          setFormData(collectionDoc.data());
+        }
+      } catch (err) {
+        console.error("Error fetching collection details:", err);
+      }
+    };
+
+    fetchCollectionDetails();
+  }, [user, collectionId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -49,25 +66,22 @@ export default function CreateCollectionForm() {
     let errors = {};
     if (!formData.name.trim()) errors.name = "Name is required.";
     if (!formData.genre) errors.genre = "Please select a genre.";
-    if (!formData.description) errors.description = "Please select a genre.";
-    if (!imageFile) errors.cover_image = "Please upload an cover image.";
+    if (!formData.description.trim())
+      errors.description = "Description is required.";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted");
     if (validateForm()) {
       try {
         const db = getFirestore(app);
         const storage = getStorage(app);
-        let coverImageUrl = "";
+        let coverImageUrl = formData.cover_image;
 
-        // Upload image to Firebase Storage
+        // Upload image to Firebase Storage if a new file is selected
         if (imageFile) {
-          //debugging
-          console.log("Uploading image:", imageFile.name);
           const imageRef = ref(
             storage,
             `cover_images/${user.uid}/${imageFile.name}`
@@ -75,28 +89,24 @@ export default function CreateCollectionForm() {
           const snapshot = await uploadBytes(imageRef, imageFile);
           coverImageUrl = await getDownloadURL(snapshot.ref);
         }
-        //debugging
-        console.log("Image uploaded, URL:", coverImageUrl);
 
-        const collectionData = {
+        const updatedData = {
           ...formData,
           cover_image: coverImageUrl,
         };
-        //debugging
-        console.log("Collection data to be added:", collectionData);
 
-        const collectionRef = collection(db, `users/${user.uid}/collections`);
-        await addDoc(collectionRef, collectionData);
-        console.log("Collection created in Firestore");
-
+        const collectionRef = doc(
+          db,
+          `users/${user.uid}/collections/${collectionId}`
+        );
+        await updateDoc(collectionRef, updatedData);
         router.push("/dashboard/profile");
       } catch (err) {
-        console.error("Error creating collection:", err);
+        console.error("Error updating collection:", err);
       }
     }
   };
 
-  // Dummy genres
   const genres = [
     "Alternative Rap",
     "Ambient",
@@ -190,15 +200,12 @@ export default function CreateCollectionForm() {
             className="mt-1 block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer focus:outline-none"
             onChange={handleImageChange}
           />
-          {formErrors.cover_image && (
-            <p className="text-red-500 text-sm">{formErrors.cover_image}</p>
-          )}
         </div>
         <button
           type="submit"
           className="mt-4 px-4 py-2 bg-green text-white rounded hover:underline"
         >
-          Create Collection
+          Update Collection
         </button>
       </form>
     </div>

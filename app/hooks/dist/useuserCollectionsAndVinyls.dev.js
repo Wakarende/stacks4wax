@@ -85,8 +85,63 @@ var useUserCollections = function useUserCollections() {
 
     fetchCollections();
   }, [user, db]);
+
+  var fetchCollectionDetails = function fetchCollectionDetails(collectionId) {
+    var collectionRef, collectionDoc;
+    return regeneratorRuntime.async(function fetchCollectionDetails$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            if (user) {
+              _context2.next = 2;
+              break;
+            }
+
+            return _context2.abrupt("return", null);
+
+          case 2:
+            _context2.prev = 2;
+            collectionRef = (0, _firestore.doc)(db, "users/".concat(user.uid, "/collections/").concat(collectionId));
+            _context2.next = 6;
+            return regeneratorRuntime.awrap((0, _firestore.getDoc)(collectionRef));
+
+          case 6:
+            collectionDoc = _context2.sent;
+
+            if (!collectionDoc.exists()) {
+              _context2.next = 11;
+              break;
+            }
+
+            return _context2.abrupt("return", _objectSpread({
+              id: collectionDoc.id
+            }, collectionDoc.data()));
+
+          case 11:
+            return _context2.abrupt("return", null);
+
+          case 12:
+            _context2.next = 19;
+            break;
+
+          case 14:
+            _context2.prev = 14;
+            _context2.t0 = _context2["catch"](2);
+            console.error("Error fetching collection details:", _context2.t0);
+            setError(_context2.t0);
+            return _context2.abrupt("return", null);
+
+          case 19:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, null, null, [[2, 14]]);
+  };
+
   return {
     collections: collections,
+    fetchCollectionDetails: fetchCollectionDetails,
     error: error
   };
 }; //Fetch vinyls for logged in user
@@ -119,34 +174,34 @@ var useUserVinyls = function useUserVinyls() {
 
     var fetchUserVinyls = function fetchUserVinyls() {
       var collectionsRef, collectionsSnapshot, collectionIds, vinylPromises, vinylsArray, userVinyls;
-      return regeneratorRuntime.async(function fetchUserVinyls$(_context3) {
+      return regeneratorRuntime.async(function fetchUserVinyls$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
               setLoading(true);
-              _context3.prev = 1;
+              _context4.prev = 1;
               collectionsRef = (0, _firestore.collection)(db, "users/".concat(user.uid, "/collections"));
-              _context3.next = 5;
+              _context4.next = 5;
               return regeneratorRuntime.awrap((0, _firestore.getDocs)(collectionsRef));
 
             case 5:
-              collectionsSnapshot = _context3.sent;
+              collectionsSnapshot = _context4.sent;
               collectionIds = collectionsSnapshot.docs.map(function (doc) {
                 return doc.id;
               });
               vinylPromises = collectionIds.map(function _callee(collectionId) {
                 var vinylsRef, vinylsSnapshot;
-                return regeneratorRuntime.async(function _callee$(_context2) {
+                return regeneratorRuntime.async(function _callee$(_context3) {
                   while (1) {
-                    switch (_context2.prev = _context2.next) {
+                    switch (_context3.prev = _context3.next) {
                       case 0:
                         vinylsRef = (0, _firestore.collection)(db, "users/".concat(user.uid, "/collections/").concat(collectionId, "/vinyls"));
-                        _context2.next = 3;
+                        _context3.next = 3;
                         return regeneratorRuntime.awrap((0, _firestore.getDocs)(vinylsRef));
 
                       case 3:
-                        vinylsSnapshot = _context2.sent;
-                        return _context2.abrupt("return", vinylsSnapshot.docs.map(function (doc) {
+                        vinylsSnapshot = _context3.sent;
+                        return _context3.abrupt("return", vinylsSnapshot.docs.map(function (doc) {
                           return _objectSpread({
                             id: doc.id
                           }, doc.data());
@@ -154,35 +209,35 @@ var useUserVinyls = function useUserVinyls() {
 
                       case 5:
                       case "end":
-                        return _context2.stop();
+                        return _context3.stop();
                     }
                   }
                 });
               });
-              _context3.next = 10;
+              _context4.next = 10;
               return regeneratorRuntime.awrap(Promise.all(vinylPromises));
 
             case 10:
-              vinylsArray = _context3.sent;
+              vinylsArray = _context4.sent;
               userVinyls = vinylsArray.flat();
               setVinyls(userVinyls);
-              _context3.next = 19;
+              _context4.next = 19;
               break;
 
             case 15:
-              _context3.prev = 15;
-              _context3.t0 = _context3["catch"](1);
-              console.error("Error fetching user vinyls:", _context3.t0);
-              setError(_context3.t0);
+              _context4.prev = 15;
+              _context4.t0 = _context4["catch"](1);
+              console.error("Error fetching user vinyls:", _context4.t0);
+              setError(_context4.t0);
 
             case 19:
-              _context3.prev = 19;
+              _context4.prev = 19;
               setLoading(false);
-              return _context3.finish(19);
+              return _context4.finish(19);
 
             case 22:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
       }, null, null, [[1, 15, 19, 22]]);
