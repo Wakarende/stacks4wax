@@ -1,12 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  doc,
-  getDocs,
-} from "firebase/firestore";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
 import { useAuth } from "./useAuth"; // Assuming useAuth is your auth hook that provides user info
 import { app } from "../../utils/firebaseConfig";
 

@@ -23,7 +23,7 @@ export default function Page() {
             key={vinyl.id} // It's better to use unique IDs than index for keys
             title={vinyl.title}
             artist={vinyl.artist.name}
-            image={vinyl.image}
+            image={vinyl.cover_image}
             link={`/dashboard/singlevinyl/${vinyl.id}`}
           />
         ))}

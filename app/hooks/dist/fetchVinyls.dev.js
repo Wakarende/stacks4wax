@@ -11,6 +11,12 @@ var _firestore = require("firebase/firestore");
 
 var _firebaseConfig = require("../../utils/firebaseConfig");
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
@@ -41,66 +47,120 @@ var useVinyls = function useVinyls(genre, searchTerm) {
     setLoading(true);
 
     var fetchVinyls = function fetchVinyls() {
-      var q, conditions, querySnapshot, vinylsData;
-      return regeneratorRuntime.async(function fetchVinyls$(_context) {
+      var usersRef, usersSnapshot, userIds, vinylPromises, allVinylsArray, allVinyls;
+      return regeneratorRuntime.async(function fetchVinyls$(_context3) {
         while (1) {
-          switch (_context.prev = _context.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
-              _context.prev = 0;
-              q = (0, _firestore.query)((0, _firestore.collection)(db, "vinyls"));
-              conditions = [];
+              _context3.prev = 0;
+              usersRef = (0, _firestore.collection)(db, "users");
+              _context3.next = 4;
+              return regeneratorRuntime.awrap((0, _firestore.getDocs)(usersRef));
 
-              if (genre) {
-                conditions.push((0, _firestore.where)("genre", "==", genre));
-              }
-
-              if (searchTerm && searchTerm.trim() !== "") {
-                // Assuming the search is case insensitive and partial matches are allowed
-                conditions.push((0, _firestore.where)("title", ">=", searchTerm));
-                conditions.push((0, _firestore.where)("title", "<=", searchTerm + "\uF8FF"));
-              }
-
-              if (conditions.length > 0) {
-                q = _firestore.query.apply(void 0, [q].concat(conditions));
-              }
-
-              _context.next = 8;
-              return regeneratorRuntime.awrap((0, _firestore.getDocs)(q));
-
-            case 8:
-              querySnapshot = _context.sent;
-              vinylsData = querySnapshot.docs.map(function (doc) {
-                var vinylData = doc.data();
-                return {
-                  id: doc.id,
-                  title: vinylData.title,
-                  image: vinylData.image,
-                  artist: vinylData.artist // Assuming 'artist' is a simple field in your vinyls documents
-
-                };
+            case 4:
+              usersSnapshot = _context3.sent;
+              userIds = usersSnapshot.docs.map(function (doc) {
+                return doc.id;
               });
-              setVinyls(vinylsData);
-              _context.next = 16;
+              vinylPromises = userIds.map(function _callee2(userId) {
+                var collectionsRef, collectionsSnapshot, collectionIds, vinylCollectionPromises, vinylsArray;
+                return regeneratorRuntime.async(function _callee2$(_context2) {
+                  while (1) {
+                    switch (_context2.prev = _context2.next) {
+                      case 0:
+                        collectionsRef = (0, _firestore.collection)(db, "users/".concat(userId, "/collections"));
+                        _context2.next = 3;
+                        return regeneratorRuntime.awrap((0, _firestore.getDocs)(collectionsRef));
+
+                      case 3:
+                        collectionsSnapshot = _context2.sent;
+                        collectionIds = collectionsSnapshot.docs.map(function (doc) {
+                          return doc.id;
+                        });
+                        vinylCollectionPromises = collectionIds.map(function _callee(collectionId) {
+                          var vinylsRef, q, conditions, vinylsSnapshot;
+                          return regeneratorRuntime.async(function _callee$(_context) {
+                            while (1) {
+                              switch (_context.prev = _context.next) {
+                                case 0:
+                                  vinylsRef = (0, _firestore.collection)(db, "users/".concat(userId, "/collections/").concat(collectionId, "/vinyls"));
+                                  q = vinylsRef;
+                                  conditions = [];
+
+                                  if (genre) {
+                                    conditions.push(where("genre", "==", genre));
+                                  }
+
+                                  if (searchTerm && searchTerm.trim() !== "") {
+                                    // Assuming the search is case insensitive and partial matches are allowed
+                                    conditions.push(where("title", ">=", searchTerm));
+                                    conditions.push(where("title", "<=", searchTerm + "\uF8FF"));
+                                  }
+
+                                  if (conditions.length > 0) {
+                                    q = query.apply(void 0, [vinylsRef].concat(conditions));
+                                  }
+
+                                  _context.next = 8;
+                                  return regeneratorRuntime.awrap((0, _firestore.getDocs)(q));
+
+                                case 8:
+                                  vinylsSnapshot = _context.sent;
+                                  return _context.abrupt("return", vinylsSnapshot.docs.map(function (doc) {
+                                    return _objectSpread({
+                                      id: doc.id
+                                    }, doc.data());
+                                  }));
+
+                                case 10:
+                                case "end":
+                                  return _context.stop();
+                              }
+                            }
+                          });
+                        });
+                        _context2.next = 8;
+                        return regeneratorRuntime.awrap(Promise.all(vinylCollectionPromises));
+
+                      case 8:
+                        vinylsArray = _context2.sent;
+                        return _context2.abrupt("return", vinylsArray.flat());
+
+                      case 10:
+                      case "end":
+                        return _context2.stop();
+                    }
+                  }
+                });
+              });
+              _context3.next = 9;
+              return regeneratorRuntime.awrap(Promise.all(vinylPromises));
+
+            case 9:
+              allVinylsArray = _context3.sent;
+              allVinyls = allVinylsArray.flat();
+              setVinyls(allVinyls);
+              _context3.next = 17;
               break;
 
-            case 13:
-              _context.prev = 13;
-              _context.t0 = _context["catch"](0);
-              setError(_context.t0);
-
-            case 16:
-              setLoading(false);
+            case 14:
+              _context3.prev = 14;
+              _context3.t0 = _context3["catch"](0);
+              setError(_context3.t0);
 
             case 17:
+              setLoading(false);
+
+            case 18:
             case "end":
-              return _context.stop();
+              return _context3.stop();
           }
         }
-      }, null, null, [[0, 13]]);
+      }, null, null, [[0, 14]]);
     };
 
     fetchVinyls();
-  }, [db, genre]);
+  }, [db, genre, searchTerm]);
   return {
     vinyls: vinyls,
     loading: loading,

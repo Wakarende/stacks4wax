@@ -6,6 +6,8 @@ import { useCollectionVinyls } from "../../../../hooks/useCollectionVinyls";
 import AlbumCard from "../../../../ui/vinyls/vinylcard.js";
 import ProtectedLayout from "../../protected-layout";
 import { useAuth } from "../../../../hooks/useAuth";
+import { IoIosAddCircleOutline } from "react-icons/io";
+import Link from "next/link";
 
 const SingleCollectionPage = () => {
   const { user, loading } = useAuth();
@@ -36,7 +38,12 @@ const SingleCollectionPage = () => {
   return (
     <ProtectedLayout>
       <div className="container mx-auto my-8">
-        <h1>Vinyls in Collection</h1>
+        <div className="flex item-center">
+          <IoIosAddCircleOutline />
+          <Link href={"#"} className="mx-1">
+            Add Vinyls
+          </Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {vinyls.map((vinyl) => (
             <AlbumCard
