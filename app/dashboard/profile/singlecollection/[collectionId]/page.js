@@ -1,6 +1,8 @@
 "use client";
+import { app } from "../../../../../utils/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getFirestore, doc, deleteDoc } from "firebase/firestore";
 import { usePathname } from "next/navigation";
 import { useCollectionVinyls } from "../../../../hooks/useCollectionVinyls";
 import { useUserCollections } from "@/app/hooks/useUserCollectionsAndVinyls";
@@ -8,7 +10,7 @@ import AlbumCard from "../../../../ui/vinyls/vinylcard.js";
 import ProtectedLayout from "../../protected-layout";
 import { useAuth } from "../../../../hooks/useAuth";
 import { IoIosAddCircleOutline } from "react-icons/io";
-import { FaRegEdit } from "react-icons/fa";
+import { FaRegEdit, FaTrashAlt } from "react-icons/fa";
 import Link from "next/link";
 
 const SingleCollectionPage = () => {
@@ -41,6 +43,21 @@ const SingleCollectionPage = () => {
     return <div>Loading...</div>;
   }
 
+  //Delete collection
+  const handleDeleteCollection = async () => {
+    try {
+      const db = getFirestore(app);
+      const collectionRef = doc(
+        db,
+        `users/${user.uid}/collections/${collectionId}`
+      );
+      await deleteDoc(collectionRef);
+      router.push("/dashboard/profile");
+    } catch (err) {
+      console.error("Error deleting collection:", err);
+    }
+  };
+
   if (!user) {
     return <div>Redirecting to login...</div>;
   }
@@ -53,7 +70,7 @@ const SingleCollectionPage = () => {
     <ProtectedLayout>
       <div className="container mx-auto my-8">
         {collection && (
-          <div className="flex items-center mb-8">
+          <div className="flex items-center mb-8 border-b pb-10 ">
             <img
               src={collection.cover_image}
               alt={collection.name}
@@ -67,20 +84,29 @@ const SingleCollectionPage = () => {
                 </p>
                 <p className="text-sm text-gray-500 mt-2">{user.username}</p>
               </div>
-              <div className="self-start">
+              <div className="self-start flex items-center space-x-4">
                 <Link
                   href={`/dashboard/profile/editcollection/${collectionId}`}
                   className="text-blue-500 hover:underline mt-2"
                 >
                   <FaRegEdit className="hover:text-green hover:underline text-lg text-gray-500" />
                 </Link>
+                <button
+                  className="text-gray-500 hover:text-red-500 mx-2"
+                  onClick={handleDeleteCollection}
+                >
+                  <FaTrashAlt className="text-lg mt-2" />
+                </button>
               </div>
             </div>
           </div>
         )}
-        <div className="flex items-center mb-4">
-          <IoIosAddCircleOutline />
-          <Link href={"#"} className="mx-1">
+        <div className="flex items-center mb-4 hover:text-green">
+          <IoIosAddCircleOutline className="text-gray-500 " />
+          <Link
+            href={"#"}
+            className="mx-1 text-gray-500 hover:text-green hover:underline"
+          >
             Add Vinyls
           </Link>
         </div>

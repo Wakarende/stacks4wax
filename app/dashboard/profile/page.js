@@ -7,6 +7,7 @@ import ProtectedLayout from "./protected-layout";
 import { useAuth } from "../../hooks/useAuth";
 import AlbumCard from "@/app/ui/vinyls/vinylcard";
 import { IoIosAddCircleOutline } from "react-icons/io";
+
 import {
   useUserCollections,
   useUserVinyls,
@@ -48,21 +49,21 @@ const UserProfilePage = () => {
                 <IoIosAddCircleOutline />
                 <Link
                   href={"/dashboard/profile/createcollection"}
-                  className="mx-1"
+                  className="mx-1 hover:underline hover:text-green"
                 >
                   Create new collection
                 </Link>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
                 {collections.map((col) => (
-                  <AlbumCard
-                    key={col.id}
-                    id={col.id}
-                    title={col.name}
-                    image={col.cover_image}
-                    link={`/dashboard/profile/singlecollection/${col.id}`}
-                    onClick={() => setActiveCollectionId(col.id)}
-                  />
+                  <div key={col.id} className="relative">
+                    <AlbumCard
+                      id={col.id}
+                      title={col.name}
+                      image={col.cover_image}
+                      link={`/dashboard/profile/singlecollection/${col.id}`}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
